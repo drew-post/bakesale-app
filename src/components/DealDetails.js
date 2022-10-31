@@ -1,13 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {View, Text, Image, StyleSheet} from 'react-native';
+import {
+  ScrollView,
+  View,
+  Text,
+  Image,
+  Button,
+  TouchableOpacity,
+  StyleSheet,
+  Linking,
+} from 'react-native';
 import {priceDisplay} from '../util';
 import ajax from '../ajax';
 
 class DealDetails extends React.Component {
   static propTypes = {
     initialDealData: PropTypes.object.isRequired,
+    onBack: PropTypes.func.isRequired,
   };
   state = {
     deal: this.props.initialDealData,
@@ -18,15 +28,21 @@ class DealDetails extends React.Component {
       deal: fullDeal,
     });
   }
+  openDealUrl = () => {
+    Linking.openURL(this.state.deal.url);
+  };
   render() {
     const {deal} = this.state;
     return (
       <View style={styles.deal}>
+        <TouchableOpacity onPress={this.props.onBack} style={styles.backLink}>
+          <Text>Back</Text>
+        </TouchableOpacity>
         <Image source={{uri: deal.media[0]}} style={styles.image} />
-        <View style={styles.detail}>
-          <View>
-            <Text style={styles.title}>{deal.title}</Text>
-          </View>
+        <View>
+          <Text style={styles.title}>{deal.title}</Text>
+        </View>
+        <ScrollView style={styles.detail}>
           <View style={styles.footer}>
             <View style={styles.info}>
               <Text style={styles.price}>{priceDisplay(deal.price)}</Text>
@@ -42,24 +58,34 @@ class DealDetails extends React.Component {
           <View style={styles.description}>
             <Text>{deal.description}</Text>
           </View>
-        </View>
+          <Button
+            title="Buy this deal!"
+            style={styles.button}
+            onPress={this.openDealUrl}
+          />
+        </ScrollView>
       </View>
     );
   }
 }
 const styles = StyleSheet.create({
   deal: {
-    marginHorizontal: 12,
-    marginTop: 60,
-    borderColor: '#bbb',
-    borderWidth: 1,
+    marginBottom: 20,
+  },
+  backLink: {
+    marginBottom: 15,
+    color: '#22f',
+    marginLeft: 10,
   },
   image: {
     width: '100%',
     height: 150,
     backgroundColor: '#ccc',
   },
-  detail: {},
+  detail: {
+    borderColor: '#bbb',
+    borderWidth: 1,
+  },
   info: {
     alignItems: 'center',
   },
@@ -79,7 +105,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   cause: {
-    alignItems: 'center',
+    marginVertical: 10,
   },
   price: {
     fontWeight: 'bold',
